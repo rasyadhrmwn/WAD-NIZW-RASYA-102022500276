@@ -34,8 +34,8 @@
                         <form action="{{ route('login') }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="email" class="form-label">Alamat Email</label>
-                                <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}" required autofocus>
+                                <label for="username" class="form-label">Username</label>
+                                <input type="username" name="username" id="username" class="form-control" value="{{ old('username') }}" required autofocus>
                             </div>
 
                             <div class="mb-3">

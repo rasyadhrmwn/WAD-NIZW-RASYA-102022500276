@@ -8,6 +8,14 @@
         header { background-color: #C8102E; color: white; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         header h2 { margin: 0; font-size: 22px; }
         header p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+
+        .nav-bar { background-color: #a00d25; color: white; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .nav-bar a { color: white; text-decoration: none; font-weight: bold; font-size: 14px; margin-right: 12px; }
+        .nav-bar a:hover { text-decoration: underline; }
+        .user-info { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+        .role-badge { background-color: #ffd166; color: #1f2937; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .btn-logout { background-color: white; color: #a00d25; border: none; padding: 5px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .btn-logout:hover { background-color: #f0f0f0; }
         
         .container { padding: 30px; flex: 1; max-width: 1100px; margin: 20px auto; width: 100%; box-sizing: border-box; background-color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 8px; }
         
@@ -43,10 +51,35 @@
     </style>
 </head>
 <body>
+    @php
+        $canManage = auth()->check() && in_array(auth()->user()->role, ['dosen', 'admin'], true);
+    @endphp
+
     <header>
         <h2>Sistem Tugas Akhir & Skripsi</h2>
         <p>Studi Kasus 11 - Modul Topik & Bidang Minat</p>
     </header>
+
+    <div class="nav-bar">
+        <div>
+            <a href="/daftar-topik">Topik & Bidang Minat</a>
+            @if($canManage)
+                <a href="/daftar-topik/create">Tambah Topik</a>
+            @endif
+        </div>
+        <div class="user-info">
+            @auth
+                <span>Halo, <strong>{{ auth()->user()->name }}</strong></span>
+                <span class="role-badge">{{ auth()->user()->role }}</span>
+                <form action="{{ route('logout') }}" method="POST" style="display:inline; margin:0;">
+                    @csrf
+                    <button type="submit" class="btn-logout">Logout</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" style="margin-right:0;">Login</a>
+            @endauth
+        </div>
+    </div>
 
     <div class="container">
         <h1>Daftar Topik Tugas Akhir & Skripsi</h1>
@@ -57,7 +90,9 @@
             </div>
         @endif
 
-        <a href="/daftar-topik/create" class="btn-tambah">+ Tambah Topik Baru</a>
+        @if($canManage)
+            <a href="/daftar-topik/create" class="btn-tambah">+ Tambah Topik Baru</a>
+        @endif
 
         <table>
             <thead>
@@ -67,7 +102,9 @@
                     <th style="width: 25%;">Nama Topik</th>
                     <th style="width: 18%;">Rumpun Ilmu</th>
                     <th style="width: 25%;">Deskripsi Fokus</th>
-                    <th style="width: 15%; text-align: center;">Aksi</th>
+                    @if($canManage)
+                        <th style="width: 15%; text-align: center;">Aksi</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -78,19 +115,21 @@
                     <td>{{ $item->nama }}</td>
                     <td>{{ $item->rumpun }}</td>
                     <td>{{ $item->deskripsi }}</td>
-                    <td style="text-align: center;">
-                        <a href="/daftar-topik/{{ $item->id }}/edit" class="btn-edit">Edit</a>
-                        
-                        <form action="/daftar-topik/{{ $item->id }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-hapus">Hapus</button>
-                        </form>
-                    </td>
+                    @if($canManage)
+                        <td style="text-align: center;">
+                            <a href="/daftar-topik/{{ $item->id }}/edit" class="btn-edit">Edit</a>
+
+                            <form action="/daftar-topik/{{ $item->id }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-hapus">Hapus</button>
+                            </form>
+                        </td>
+                    @endif
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 30px; color: #666;">Belum ada data topik tersedia.</td>
+                    <td colspan="{{ $canManage ? 6 : 5 }}" style="text-align: center; padding: 30px; color: #666;">Belum ada data topik tersedia.</td>
                 </tr>
                 @endforelse
             </tbody>

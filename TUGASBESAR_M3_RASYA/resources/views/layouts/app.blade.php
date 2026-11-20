@@ -49,6 +49,15 @@
             font-size: 14px;
             font-weight: bold;
         }
+        .role-badge {
+            background-color: #ffd166;
+            color: #1f2937;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
         .btn-logout {
             background-color: #ffffff;
             color: #a00d25;
@@ -109,6 +118,7 @@
             @auth
                 <!-- Tampil Jika Sudah Login -->
                 <span class="user-name">Halo, {{ Auth::user()->name }}</span>
+                <span class="role-badge">{{ Auth::user()->role }}</span>
                 <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf
                     <button type="submit" class="btn-logout">Logout</button>

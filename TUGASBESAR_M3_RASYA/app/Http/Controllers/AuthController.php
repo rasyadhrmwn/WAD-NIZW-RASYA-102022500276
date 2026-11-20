@@ -16,24 +16,20 @@ class AuthController extends Controller
     // Proses autentikasi/login
     public function login(Request $request)
     {
-        // Validasi input
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'username' => ['required', 'string'],
             'password' => ['required'],
         ]);
 
-        // Cek kredensial ke database
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // Redirect ke halaman dashboard/topik_baru jika berhasil
-            return redirect()->intended('/topik_baru')->with('success', 'Berhasil login!');
+            return redirect()->intended('/daftar-topik')->with('success', 'Berhasil login!');
         }
 
-        // Jika gagal
         return back()->withErrors([
-            'email' => 'Email atau password yang Anda masukkan salah.',
-        ])->onlyInput('email');
+            'username' => 'Username atau password yang Anda masukkan salah.',
+        ])->onlyInput('username');
     }
 
     // Proses logout
